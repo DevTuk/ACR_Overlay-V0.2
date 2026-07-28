@@ -1,0 +1,9 @@
+natsort
+numpy
+psutil
+pycaw
+pygame-ce
+PyYAML
+sounddevice
+comtypes
+keyboard

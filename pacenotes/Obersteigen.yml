@@ -1,0 +1,165 @@
+- distance: 4646
+  link_to_next: false
+  notes: [Left3, Tightens]
+- distance: 4712
+  link_to_next: false
+  notes: [Left3]
+- distance: 4777
+  link_to_next: false
+  notes: [Dist40, KeepRight]
+- distance: 4817
+  link_to_next: false
+  notes: [Left3, DontCut]
+- distance: 4848
+  link_to_next: false
+  notes: [And, RightFlat]
+- distance: 4909
+  link_to_next: false
+  notes: [Left6]
+- distance: 4965
+  link_to_next: false
+  notes: [Dist80]
+- distance: 5052
+  link_to_next: false
+  notes: [Left5]
+- distance: 5109
+  link_to_next: false
+  notes: [Pause0.5s_Reset, And, Right5, Long, sobre_cresta]
+- distance: 5207
+  link_to_next: false
+  notes: [Dist150]
+- distance: 5360
+  link_to_next: false
+  notes: [Caution, Brake, RightChicane, Narrows]
+- distance: 5424
+  link_to_next: false
+  notes: [Pause1.5s, Dist60]
+- distance: 5488
+  link_to_next: false
+  notes: [Right5]
+- distance: 5562
+  link_to_next: false
+  notes: [Dist250]
+- distance: 5814
+  link_to_next: false
+  notes: [Right5, Long, OverCrest, KeepIn]
+- distance: 5889
+  link_to_next: false
+  notes: [Dist80]
+- distance: 5972
+  link_to_next: false
+  notes: [Right5, Long]
+- distance: 6082
+  link_to_next: false
+  notes: [Dist250, sobre_cresta]
+- distance: 6335
+  link_to_next: false
+  notes: [Left5, DontCut]
+- distance: 6401
+  link_to_next: false
+  notes: [Into, Right5, Tightens]
+- distance: 6475
+  link_to_next: false
+  notes: [Dist60, sobre_cresta]
+- distance: 6539
+  link_to_next: false
+  notes: [Caution, Left4, DontCut]
+- distance: 6582
+  link_to_next: false
+  notes: [Pause0.5s, Into, Right3, Tightens]
+- distance: 6666
+  link_to_next: false
+  notes: [Left5, DontCut]
+- distance: 6720
+  link_to_next: false
+  notes: [Dist50]
+- distance: 6769
+  link_to_next: false
+  notes: [Right3, Tightens]
+- distance: 6841
+  link_to_next: false
+  notes: [And, Left6]
+- distance: 6899
+  link_to_next: false
+  notes: [Dist100]
+- distance: 7002
+  link_to_next: false
+  notes: [Caution, LeftHP, TightensLate]
+- distance: 7058
+  link_to_next: false
+  notes: [Dist50]
+- distance: 7108
+  link_to_next: false
+  notes: [Left5]
+- distance: 7142
+  link_to_next: false
+  notes: [Dist250, Kinks]
+- distance: 7388
+  link_to_next: false
+  notes: [Caution, HeavyBrake, Left1, DontCut]
+- distance: 7473
+  link_to_next: false
+  notes: [Right2, Opens]
+- distance: 7529
+  link_to_next: false
+  notes: [And, Right4, Narrows, OverBridge]
+- distance: 7603
+  link_to_next: false
+  notes: [Right5]
+- distance: 7629
+  link_to_next: false
+  notes: [Into, LeftHP]
+- distance: 7676
+  link_to_next: false
+  notes: [Pause0.5s, Dist70]
+- distance: 7749
+  link_to_next: false
+  notes: [Left6]
+- distance: 7798
+  link_to_next: false
+  notes: [Into, Right4]
+- distance: 7871
+  link_to_next: false
+  notes: [Dist300, Kinks]
+- distance: 8158
+  link_to_next: false
+  notes: [Right6, Early, frenar_mucho]
+- distance: 8221
+  link_to_next: false
+  notes: [Into, RightHP]
+- distance: 8316
+  link_to_next: false
+  notes: [LeftKink]
+- distance: 8359
+  link_to_next: false
+  notes: [Dist200]
+- distance: 8567
+  link_to_next: false
+  notes: [Left6, Tighten5]
+- distance: 8630
+  link_to_next: false
+  notes: [Dist40]
+- distance: 8679
+  link_to_next: false
+  notes: [Right5, Long]
+- distance: 8765
+  link_to_next: false
+  notes: [Dist40]
+- distance: 8807
+  link_to_next: false
+  notes: [Left4, VeryLong, Opens]
+- distance: 8923
+  link_to_next: false
+  notes: [Pause0.5s_Reset, And, Left5, Tighten4, Late]
+- distance: 9052
+  link_to_next: false
+  notes: [Into, Right3, Tightens]
+- distance: 9124
+  link_to_next: false
+  notes: [Pause0.25s, And, Left4]
+- distance: 9178
+  link_to_next: false
+  notes: [Finish]
+- distance: 9316
+  link_to_next: false
+  notes: [Pause1s, SlowDown, And, StopAtMarshals]

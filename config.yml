@@ -1,0 +1,30 @@
+call_distance: 1.1
+call_speed_multiplier: 1.0
+calls_ahead: 4
+editor_alpha: 1.0
+editor_height: 680
+editor_width: 1065
+handbrake:
+  device: 0
+  number: 1
+  pressed: 0.5
+  released: 0.0
+  threshold: 0.7
+  type: axis
+lang: es
+overlay_alpha: 1.0
+overlay_width: 900
+overlay_x: 783
+overlay_y: 144
+start_beep_volume: 1.0
+start_countdown: true
+start_mode: automatic
+voice: Italian
+
+shortcut:
+  type: keyboard
+  modifiers:
+  - ctrl
+  - alt
+  key: F9
+  vk: 120

@@ -1,0 +1,55 @@
+# ── Python ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ── Entornos virtuales ─────────────────────────────────────────────
+.venv/
+venv/
+env/
+.build-venv/
+
+# ── PyInstaller y ejecutables generados ────────────────────────────
+build/
+dist/
+*.spec
+.pyinstaller-build*/
+.pyinstaller-dist*/
+EXE_COMPILADO/
+ProgramaPacenotesMod/
+ProgramaPacenotesMod onefile/
+*.exe
+
+# ── Voces externas ─────────────────────────────────────────────────
+# Los WAV pueden ser muy pesados y se agregan localmente antes de ejecutar.
+voices/*
+!voices/PEGAR_CARPETAS_DE_VOZ_AQUI.txt
+
+# ── Archivos temporales y diagnósticos ─────────────────────────────
+*.log
+*.tmp
+*.temp
+*.bak
+*.old
+*.dmp
+~$*
+
+# ── Paquetes y copias locales ──────────────────────────────────────
+*.zip
+*.rar
+*.7z
+
+# ── Editores y sistema operativo ───────────────────────────────────
+.vscode/
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
