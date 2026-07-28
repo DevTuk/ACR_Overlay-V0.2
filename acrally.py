@@ -42,6 +42,7 @@ class ACRally:
             handbrake_config=None,
             countdown_enabled=True,
             start_beep_volume=0.65,
+            smart_anticipation=True,
     ):
         self.stage = stage
         self.voice = voice
@@ -55,6 +56,10 @@ class ACRally:
         # Conservamos el argumento por compatibilidad con versiones viejas.
         self.countdown_enabled = True
         self.start_beep_volume = max(0.0, min(1.0, float(start_beep_volume)))
+        # Si está desactivado, las notas se disparan únicamente al alcanzar
+        # la distancia escrita en el YAML. No se compensa ni la duración de
+        # la frase ni la velocidad del auto.
+        self.smart_anticipation = bool(smart_anticipation)
         self.notes_list = []
         self.exit_all = False
         self.started = False
@@ -233,14 +238,11 @@ class ACRally:
                            and previous_distances[0] < self.distance):
                         previous_distances.pop(0)
 
+                    anticipation = self.get_anticipation_distance(
+                        self.notes_list[0])
                     if (len(previous_distances) < self.max_calls_ahead
                             and self.notes_list[0]["distance"]
-                            < self.distance
-                            + (self.notes_list[0]["duration"]
-                               * (self.speed_kmh * (5/18)))
-                            + (self.call_earliness
-                               * ((self.speed_kmh * (5/18))
-                                  ** self.call_speed_multiplier))):
+                            <= self.distance + anticipation):
                         note = self.notes_list.pop(0)
                         previous_distances.append(note["distance"])
                         tokens = self.combine_tokens(note["notes"], token_sounds)
@@ -553,6 +555,24 @@ class ACRally:
                         note["duration"] += duration
                 elif pause_time := self.match_pause(token):
                     note["duration"] += pause_time
+
+    def get_anticipation_distance(self, note):
+        """Calcula cuántos metros antes debe comenzar una nota.
+
+        En modo estricto devuelve cero: la distancia del YAML manda. En modo
+        inteligente conserva el comportamiento histórico, anticipando por la
+        duración completa de la frase y por el adelanto manual configurado.
+        """
+        if not self.smart_anticipation:
+            return 0.0
+
+        speed_mps = max(0.0, self.speed_kmh * (5 / 18))
+        duration_anticipation = float(note.get("duration", 0.0)) * speed_mps
+        manual_anticipation = (
+            self.call_earliness
+            * (speed_mps ** self.call_speed_multiplier)
+        )
+        return duration_anticipation + manual_anticipation
 
     def get_distance(self):
         return self.distance

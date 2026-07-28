@@ -1,5 +1,7 @@
 """Controles de voz, anticipación y volumen general."""
 
+import tkinter as tk
+
 from .helpers import set_app_volume
 
 
@@ -39,12 +41,32 @@ class OverlayControlsMixin:
             )
 
     def _step_timing(self, delta):
-        v = round(max(0.1, min(10.0, self.dist_var.get() + delta)), 1)
+        if not self.smart_anticipation_var.get():
+            return
+        v = round(max(1.1, min(10.0, self.dist_var.get() + delta)), 1)
         self.dist_var.set(v)
         self.dist_label_var.set(f"{v:.1f}s")
         self._save("call_distance", v)
         if self.main.acrally:
             self.main.acrally.call_earliness = v
+
+    def _toggle_smart_anticipation(self):
+        """Activa el adelanto histórico o el disparo estricto por odómetro."""
+        enabled = bool(self.smart_anticipation_var.get())
+        self._save("smart_anticipation", enabled)
+        self._sync_anticipation_controls()
+        if self.main.acrally:
+            self.main.acrally.smart_anticipation = enabled
+
+    def _sync_anticipation_controls(self):
+        """Refleja el modo seleccionado sin perder el valor de adelanto."""
+        enabled = bool(self.smart_anticipation_var.get())
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.timing_minus_btn.config(state=state)
+        self.timing_plus_btn.config(state=state)
+        self.dist_label_var.set(
+            f"{self.dist_var.get():.1f}s" if enabled
+            else self._tr("timing_disabled"))
 
     def _on_volume_change(self, value):
         percent = max(0.0, min(100.0, float(value)))

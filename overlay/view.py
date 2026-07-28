@@ -236,22 +236,34 @@ class OverlayViewMixin:
         tk.Label(
             timing_cell, text=self._tr("timing_label"),
             bg=BG, fg=MUTED, font=FONT_CAPTION,
-            width=10, anchor="w"
+            width=8, anchor="w"
         ).pack(side="left")
-        refined_button(
+        tk.Checkbutton(
+            timing_cell,
+            variable=self.smart_anticipation_var,
+            command=self._toggle_smart_anticipation,
+            text=self._tr("timing_smart_short"),
+            bg=BG, fg=FG, selectcolor=BG2,
+            activebackground=BG, activeforeground=FG,
+            font=FONT_CAPTION, padx=0, pady=0,
+        ).pack(side="left", padx=(0, PAD_XS))
+        self.timing_minus_btn = refined_button(
             timing_cell, "−", lambda: self._step_timing(-0.5),
             bg=BG3, fg=FG, width=2
-        ).pack(side="left", pady=(2, 4))
+        )
+        self.timing_minus_btn.pack(side="left", pady=(2, 4))
         self.dist_label_var = tk.StringVar(
             value=f"{self.dist_var.get():.1f}s")
         tk.Label(
             timing_cell, textvariable=self.dist_label_var,
-            bg=BG, fg=FG, font=FONT_BODY, width=10
+            bg=BG, fg=FG, font=FONT_BODY, width=5
         ).pack(side="left", fill="x", expand=True)
-        refined_button(
+        self.timing_plus_btn = refined_button(
             timing_cell, "+", lambda: self._step_timing(0.5),
             bg=BG3, fg=FG, width=2
-        ).pack(side="right", pady=(2, 4))
+        )
+        self.timing_plus_btn.pack(side="right", pady=(2, 4))
+        self._sync_anticipation_controls()
 
         # ── Columna 3: estado y editor ─────────────────────────────
         status_cell = cell(4, 0)

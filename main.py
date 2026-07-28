@@ -375,6 +375,8 @@ class Main:
             handbrake_config=self.config.get("handbrake", {}),
             countdown_enabled=True,
             start_beep_volume=float(self.config.get("start_beep_volume", 0.35)),
+            smart_anticipation=bool(
+                self.config.get("smart_anticipation", True)),
         )
         if resume_started:
             # Cambio de voz en caliente: la etapa ya fue largada. La nueva

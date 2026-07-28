@@ -49,6 +49,21 @@ overlay/
 - La voz y el adelanto modifican la misma configuración compartida por `Main`.
 - `config.yml`, `stage_map.yml`, `voices` y `pacenotes` se leen junto al proyecto o al EXE.
 
+## Adelanto inteligente
+
+El selector **Auto** situado junto a **Adelanto** permite elegir entre dos
+comportamientos:
+
+- Activado: compensa la duración completa de la nota, la velocidad del auto
+  y el adelanto manual configurado desde `1.1 s`.
+- Desactivado (`OFF`): ignora ambas compensaciones y dispara la nota al
+  alcanzar la distancia escrita en el YAML, con la pequeña tolerancia propia
+  de la frecuencia de lectura de la telemetría.
+
+La selección se guarda inmediatamente como `smart_anticipation` en
+`config.yml`. Las configuraciones antiguas que no tengan esa clave conservan
+el comportamiento inteligente original.
+
 ## Overlay sin pérdida de foco
 
 En Windows, el wrapper nativo del overlay usa `WS_EX_NOACTIVATE`. El orden visual se mantiene con `SetWindowPos(..., SWP_NOACTIVATE)`: el overlay no llama a `SetForegroundWindow`, no intenta devolver el foco y no compite con ACRally.

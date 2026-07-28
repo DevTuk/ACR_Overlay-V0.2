@@ -48,6 +48,19 @@ overlay/
 - Voice and pacenote timing controls update the same configuration shared by `Main`.
 - `config.yml`, `stage_map.yml`, `voices`, and `pacenotes` are loaded from the project directory or from the folder next to the compiled executable.
 
+## Smart Anticipation
+
+The **Smart** selector next to **Timing** provides two behaviors:
+
+- Enabled: compensates for the complete pacenote duration, vehicle speed,
+  and the configurable manual timing value starting at `1.1 s`.
+- Disabled (`OFF`): ignores both compensations and triggers the pacenote when
+  the odometer reaches the distance stored in the YAML, within the small
+  tolerance introduced by the telemetry polling interval.
+
+The selection is immediately stored as `smart_anticipation` in `config.yml`.
+Older configurations without this key keep the original smart behavior.
+
 ## Non-Activating Floating Overlay
 
 On Windows, the overlay uses the same focus path as the stable pre-refactor versions: Tk show/hide plus `WS_EX_NOACTIVATE` and `SetWindowPos(..., SWP_NOACTIVATE)`. The overlay never calls `SetForegroundWindow`. Keyboard shortcuts use the global `keyboard` backend because ACRally can consume combinations before `RegisterHotKey` receives them.

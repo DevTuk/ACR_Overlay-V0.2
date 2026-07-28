@@ -102,9 +102,16 @@ class Overlay(
                     self.main.config, config_file,
                     allow_unicode=True, sort_keys=False)
 
-        self.dist_var = tk.DoubleVar(
-            value=self.main.config.get("call_distance", 3.0)
-        )
+        # El modo inteligente mantiene el comportamiento histórico. Al
+        # desactivarlo, el motor respeta estrictamente la distancia del YAML.
+        self.smart_anticipation_var = tk.BooleanVar(
+            value=bool(
+                self.main.config.get("smart_anticipation", True)))
+        configured_timing = max(
+            1.1, float(self.main.config.get("call_distance", 1.1)))
+        self.dist_var = tk.DoubleVar(value=configured_timing)
+        self.main.config["call_distance"] = configured_timing
+        self.main.config.setdefault("smart_anticipation", True)
         self.lang = self.main.config.get("lang", "es")
         self._last_track = None
 
