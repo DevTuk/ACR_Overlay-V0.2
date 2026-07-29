@@ -1,4 +1,4 @@
-# ACRally Pacenote Overlay — versión modular
+# ACRally Pacenote Overlay v0.2.1 — versión modular
 
 
 [English version](README_EN.md)
@@ -63,6 +63,17 @@ comportamientos:
 La selección se guarda inmediatamente como `smart_anticipation` en
 `config.yml`. Las configuraciones antiguas que no tengan esa clave conservan
 el comportamiento inteligente original.
+
+## Búsqueda de llamadas en el editor
+
+Los campos de llamada filtran el catálogo de la voz seleccionada después de
+que transcurre `1 segundo` sin nuevas pulsaciones. Cada tecla reinicia la
+espera, evitando que las sugerencias interrumpan la escritura. La búsqueda no
+distingue mayúsculas, acentos, espacios, guiones ni guiones bajos, por lo que
+`left 4` puede encontrar `Left4`. Al seleccionar un resultado se conserva y
+guarda el token interno exacto definido por el WAV o por `dictionary.yml`.
+Cuando hay más coincidencias que líneas visibles, la lista conserva todos los
+resultados y permite recorrerlos con su barra vertical o la rueda del mouse.
 
 ## Overlay sin pérdida de foco
 

@@ -1,9 +1,11 @@
 import ctypes
 import os
+import re
 import threading
 import time
 import tkinter as tk
 import tkinter.messagebox as mb
+import unicodedata
 from tkinter import ttk
 
 import yaml
@@ -33,6 +35,36 @@ SWP_NOMOVE = 0x0002
 SWP_NOSIZE = 0x0001
 SWP_NOZORDER = 0x0004
 SWP_NOACTIVATE = 0x0010
+
+PACENOTE_SEARCH_DELAY_MS = 1000
+PACENOTE_SEARCH_MAX_RESULTS = 8
+
+
+def _normalize_pacenote_search(value):
+    """Normaliza una búsqueda sin modificar el nombre real de la llamada.
+
+    Así, por ejemplo, ``left 4``, ``Left-4`` y ``left_4`` buscan la misma
+    secuencia. El valor seleccionado y guardado conserva siempre su escritura
+    original.
+    """
+    decomposed = unicodedata.normalize("NFKD", str(value))
+    without_accents = "".join(
+        character for character in decomposed
+        if not unicodedata.combining(character)
+    )
+    return re.sub(
+        r"[\W_]+", "", without_accents, flags=re.UNICODE).casefold()
+
+
+def filter_pacenote_options(options, query):
+    """Devuelve las llamadas que contienen el texto escrito por el usuario."""
+    normalized_query = _normalize_pacenote_search(query)
+    if not normalized_query:
+        return list(options)
+    return [
+        option for option in options
+        if normalized_query in _normalize_pacenote_search(option)
+    ]
 
 
 def configure_editor_styles(root):
@@ -447,6 +479,8 @@ class Editor:
 
                 def create_entry(note_idx, t):
                     note_var = tk.StringVar(value=self.reverse_dictionary.get(t, t))
+                    search_after_id = None
+                    suggestion_popup = None
                     note_combo = ttk.Combobox(
                         pacenotes_frame,
                         values=self.pacenote_options,
@@ -458,6 +492,180 @@ class Editor:
                         padx=(0, 1), pady=(0, 1))
                     note_combo.unbind_class("TCombobox", "<MouseWheel>")
 
+                    def cancel_search_timer():
+                        nonlocal search_after_id
+                        if search_after_id is not None:
+                            try:
+                                note_combo.after_cancel(search_after_id)
+                            except tk.TclError:
+                                pass
+                            search_after_id = None
+
+                    def hide_suggestions():
+                        nonlocal suggestion_popup
+                        if suggestion_popup is not None:
+                            try:
+                                suggestion_popup.destroy()
+                            except tk.TclError:
+                                pass
+                            suggestion_popup = None
+
+                    def choose_suggestion(event, listbox):
+                        """Selecciona con el mouse sin quitar foco al campo."""
+                        index = listbox.nearest(event.y)
+                        if index < 0 or index >= listbox.size():
+                            return "break"
+                        note_var.set(listbox.get(index))
+                        hide_suggestions()
+                        note_combo.focus_set()
+                        note_combo.icursor("end")
+                        note_change(event)
+                        return "break"
+
+                    def show_suggestions(expected_query):
+                        """Muestra resultados sin interrumpir la escritura."""
+                        nonlocal search_after_id, suggestion_popup
+                        search_after_id = None
+                        if not note_combo.winfo_exists():
+                            return
+                        if note_var.get() != expected_query:
+                            return
+
+                        matches = filter_pacenote_options(
+                            self.pacenote_options, expected_query)
+                        note_combo.configure(values=matches)
+                        hide_suggestions()
+                        if not matches or not expected_query.strip():
+                            return
+
+                        popup = tk.Toplevel(self.root)
+                        suggestion_popup = popup
+                        popup.withdraw()
+                        popup.overrideredirect(True)
+                        popup.attributes("-topmost", True)
+                        popup.configure(bg=BORDER)
+
+                        visible_count = min(
+                            len(matches), PACENOTE_SEARCH_MAX_RESULTS)
+                        results_frame = tk.Frame(
+                            popup, background=BORDER, borderwidth=0)
+                        results_frame.pack(fill="both", expand=True)
+                        listbox = tk.Listbox(
+                            results_frame,
+                            height=visible_count,
+                            background=BG2,
+                            foreground=FG,
+                            selectbackground=ACCENT,
+                            selectforeground=BG,
+                            activestyle="none",
+                            borderwidth=1,
+                            relief="solid",
+                            highlightthickness=0,
+                            exportselection=False,
+                            takefocus=False,
+                            font=FONT_BODY,
+                        )
+                        for option in matches:
+                            listbox.insert("end", option)
+                        listbox.pack(
+                            side="left", fill="both", expand=True)
+
+                        if len(matches) > visible_count:
+                            scrollbar = tk.Scrollbar(
+                                results_frame,
+                                orient="vertical",
+                                command=listbox.yview,
+                                takefocus=False,
+                            )
+                            scrollbar.pack(side="right", fill="y")
+                            listbox.configure(
+                                yscrollcommand=scrollbar.set)
+
+                        listbox.bind(
+                            "<ButtonPress-1>",
+                            lambda event: choose_suggestion(event, listbox))
+
+                        popup.update_idletasks()
+                        width = max(
+                            note_combo.winfo_width(),
+                            popup.winfo_reqwidth())
+                        height = popup.winfo_reqheight()
+                        x = note_combo.winfo_rootx()
+                        y = (
+                            note_combo.winfo_rooty()
+                            + note_combo.winfo_height()
+                        )
+                        popup.geometry(f"{width}x{height}+{x}+{y}")
+
+                        # Tk debe sacar el Toplevel del estado ``withdrawn``;
+                        # mostrar solamente su HWND dejaba la lista invisible.
+                        # En Windows agregamos NOACTIVATE al wrapper nativo
+                        # antes de mapearlo para conservar el cursor de texto.
+                        try:
+                            user32 = ctypes.windll.user32
+                            content_hwnd = int(popup.winfo_id())
+                            hwnd = int(
+                                user32.GetParent(content_hwnd)
+                                or content_hwnd)
+                            ex_style = user32.GetWindowLongW(
+                                hwnd, GWL_EXSTYLE)
+                            user32.SetWindowLongW(
+                                hwnd,
+                                GWL_EXSTYLE,
+                                ex_style | WS_EX_NOACTIVATE,
+                            )
+                            popup.deiconify()
+                            popup.update_idletasks()
+                            user32.SetWindowPos(
+                                hwnd,
+                                HWND_TOPMOST,
+                                0,
+                                0,
+                                0,
+                                0,
+                                SWP_NOMOVE
+                                | SWP_NOSIZE
+                                | SWP_NOACTIVATE,
+                            )
+                        except Exception:
+                            popup.deiconify()
+                        note_combo.focus_set()
+                        note_combo.icursor("end")
+
+                    def filter_notes(event=None):
+                        """Espera 1 s desde la última tecla antes de sugerir."""
+                        nonlocal search_after_id
+                        if event is not None and event.keysym in {
+                                "Up", "Down", "Left", "Right", "Prior",
+                                "Next", "Home", "End", "Return", "Escape",
+                                "Tab", "Shift_L", "Shift_R", "Control_L",
+                                "Control_R", "Alt_L", "Alt_R"}:
+                            return
+
+                        cancel_search_timer()
+                        hide_suggestions()
+                        query = note_var.get()
+                        matches = filter_pacenote_options(
+                            self.pacenote_options, query)
+                        note_combo.configure(values=matches)
+
+                        if not query.strip():
+                            return
+
+                        search_after_id = note_combo.after(
+                            PACENOTE_SEARCH_DELAY_MS,
+                            lambda current=query:
+                                show_suggestions(current))
+
+                    def restore_note_options(event=None):
+                        cancel_search_timer()
+                        hide_suggestions()
+                        note_combo.configure(values=self.pacenote_options)
+
+                    def destroy_note_search(event=None):
+                        cancel_search_timer()
+                        hide_suggestions()
+
                     def note_change(e, note_idx=note_idx):
                         new_note = self.dictionary.get(note_var.get(), note_var.get())
                         old_note = self.pacenotes[i]["notes"][note_idx]
@@ -468,7 +676,24 @@ class Editor:
                                 i
                             )
                             self.scroll_frame.set_scroll(scroll)
-                    note_combo.bind("<FocusOut>", note_change)
+                        restore_note_options()
+
+                    def note_focus_out(event):
+                        """Confirma solo si el foco realmente dejó el campo."""
+                        def confirm_if_still_outside():
+                            try:
+                                if self.root.focus_get() is note_combo:
+                                    return
+                            except tk.TclError:
+                                return
+                            note_change(event)
+
+                        self.root.after_idle(confirm_if_still_outside)
+
+                    note_combo.bind("<KeyRelease>", filter_notes)
+                    note_combo.bind(
+                        "<Destroy>", destroy_note_search, add="+")
+                    note_combo.bind("<FocusOut>", note_focus_out)
                     note_combo.bind("<<ComboboxSelected>>", note_change)
                     note_combo.bind("<Return>", note_change)
                     self.pacenote_vars.append(note_var)

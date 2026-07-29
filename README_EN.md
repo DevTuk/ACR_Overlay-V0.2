@@ -1,4 +1,4 @@
-# ACRally Pacenote Overlay — Modular Version
+# ACRally Pacenote Overlay v0.2.1 — Modular Version
 
 [Versión en español](README.md)
 
@@ -60,6 +60,16 @@ The **Smart** selector next to **Timing** provides two behaviors:
 
 The selection is immediately stored as `smart_anticipation` in `config.yml`.
 Older configurations without this key keep the original smart behavior.
+
+## Pacenote Call Search
+
+Call fields filter the selected voice catalog after `1 second` without another
+key press. Each new key resets the delay so suggestions never interrupt
+typing. Search is case-insensitive and ignores accents, spaces, hyphens, and
+underscores, so `left 4` can find `Left4`. Selecting a result preserves and
+saves the exact internal token defined by the WAV file or `dictionary.yml`.
+When matches exceed the visible rows, the list keeps every result and can be
+navigated with its vertical scrollbar or the mouse wheel.
 
 ## Non-Activating Floating Overlay
 
